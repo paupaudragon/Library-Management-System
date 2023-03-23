@@ -19,14 +19,13 @@ Expected:
 
 [
 {"isbn":"978-0062278791","title":"Profiles in Courage","author":"Kennedy","serial":1006,"name":"Dan"},
-{"isbn":"978-0261102309","title":"The Lord of the Rings","author":"Tolkien","serial":null,"name":""},
+{"isbn":"978-0261102309","title":"The Lord of the Rings","author":"Tolkien","serial":1010,"name":""},
 {"isbn":"978-0394823379","title":"The Lorax","author":"Seuss","serial":1004,"name":"Joe"},
 {"isbn":"978-0394823379","title":"The Lorax","author":"Seuss","serial":1005,"name":"Dan"},
-{"isbn":null,"title":"Dune","author":"Herbert","serial":null,"name":""},
+{"isbn":"978-0441172719","title":"Dune","author":"Herbert","serial":null,"name":""},
 {"isbn":"978-0547928227","title":"The Hobbit","author":"Tolkien","serial":1001,"name":"Joe"},
-{"isbn":"978-0547928227","title":"The Hobbit","author":"Tolkien","serial":null,"name":""},
-{"isbn":"978-0553283686","title":"Hyperion","author":"Simmons","serial":null,"name":""},
-{"isbn":"978-0553283689","title":"Endymion","author":"Simmons","serial":null,"name":""},
-{"isbn":"978-0679732242","title":"The Sound and the Fury","author":"Faulkner","serial":null,"name":""}
+{"isbn":"978-0547928227","title":"The Hobbit","author":"Tolkien","serial":1002,"name":""},
+{"isbn":"978-0553283686","title":"Hyperion","author":"Simmons","serial":1008,"name":""},
+{"isbn":"978-0553283689","title":"Endymion","author":"Simmons","serial":1009,"name":""},
+{"isbn":"978-0679732242","title":"The Sound and the Fury","author":"Faulkner","serial":1003,"name":""}
 ]
-

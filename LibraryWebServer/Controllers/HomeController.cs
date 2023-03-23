@@ -92,18 +92,17 @@ namespace LibraryWebServer.Controllers
                             from t1 in temp1.DefaultIfEmpty()
                             join c in db.CheckedOut on t1.Serial equals c.Serial into temp2
                             from t2 in temp2.DefaultIfEmpty()
-                            join p in db.Patrons on t2.CardNum equals p.CardNum into temp3 
+                            join p in db.Patrons on t2.CardNum equals p.CardNum into temp3
                             from t3 in temp3.DefaultIfEmpty()
                             select new
                             {
                                 isbn = t.Isbn,
                                 title = t.Title,
                                 author = t.Author,
-                                serial = t1 == null ? null : (uint? )t1.Serial,
-                                name = t3 == null? String.Empty: t3.Name
+                                serial = t1 == null ? null : (uint?)t1.Serial,
+                                name = t3 == null ? String.Empty : t3.Name
                             };
-
-                //System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(Json(query.ToArray()).Value));
+                System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(Json(query.ToArray()).Value));
                 return Json(query.ToArray());
             }
 
@@ -123,7 +122,27 @@ namespace LibraryWebServer.Controllers
         public ActionResult ListMyBooks()
         {
             // TODO: Implement
-            return Json(null);
+            // Tzhou: finished
+            using (Team28LibraryContext db = new Team28LibraryContext())
+            {
+                var query = from c in db.CheckedOut
+                            where c.CardNum == card
+                            join i in db.Inventory on c.Serial equals i.Serial
+                            join t in db.Titles on i.Isbn equals t.Isbn
+                            join p in db.Patrons on c.CardNum equals p.CardNum
+                            select new
+                            {
+                                title = c == null ? String.Empty : t.Title,
+                                author = c == null ? String.Empty : t.Author,
+                                serial = c == null ? null : (uint?)c.Serial,
+                                name = c == null ? String.Empty : p.Name
+
+                            };
+                System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(Json(query.ToArray()).Value));
+                return Json(query.ToArray());
+
+            }
+           
         }
 
 
