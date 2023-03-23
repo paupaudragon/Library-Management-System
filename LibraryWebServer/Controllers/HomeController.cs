@@ -82,8 +82,6 @@ namespace LibraryWebServer.Controllers
         [HttpPost]
         public ActionResult AllTitles()
         {
-
-            // TODO: Implement
             // Tzhou: finished
             using (Team28LibraryContext db = new Team28LibraryContext())
             {
@@ -121,7 +119,6 @@ namespace LibraryWebServer.Controllers
         [HttpPost]
         public ActionResult ListMyBooks()
         {
-            // TODO: Implement
             // Tzhou: finished
             using (Team28LibraryContext db = new Team28LibraryContext())
             {
@@ -142,7 +139,7 @@ namespace LibraryWebServer.Controllers
                 return Json(query.ToArray());
 
             }
-           
+
         }
 
 
@@ -157,8 +154,12 @@ namespace LibraryWebServer.Controllers
         [HttpPost]
         public ActionResult CheckOutBook(int serial)
         {
-            // You may have to cast serial to a (uint)
-
+            using (Team28LibraryContext db = new Team28LibraryContext())
+            {
+                CheckedOut checkout = new CheckedOut() { CardNum = (uint)card, Serial = (uint)serial };
+                db.CheckedOut.Add(checkout);
+                db.SaveChanges();
+            }
 
             return Json(new { success = true });
         }
@@ -173,8 +174,15 @@ namespace LibraryWebServer.Controllers
         [HttpPost]
         public ActionResult ReturnBook(int serial)
         {
-            // You may have to cast serial to a (uint)
-
+            using (Team28LibraryContext db = new Team28LibraryContext())
+            {
+                CheckedOut? rowToDelete = db.CheckedOut.FirstOrDefault(c => c.CardNum == card && c.Serial == serial);
+                if (rowToDelete != null)
+                {
+                    db.CheckedOut.Remove(rowToDelete);
+                    db.SaveChanges();
+                }
+            }
             return Json(new { success = true });
         }
 
