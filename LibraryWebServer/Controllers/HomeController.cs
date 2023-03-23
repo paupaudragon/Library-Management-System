@@ -1,6 +1,6 @@
 ﻿using LibraryWebServer.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Newtonsoft.Json; // added by tzhou
 using System.Diagnostics;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -86,20 +86,23 @@ namespace LibraryWebServer.Controllers
             // TODO: Implement
             using (Team28LibraryContext db = new Team28LibraryContext())
             {
-                var query = from i in db.Inventory
-                            join t in db.Titles on i.Isbn equals t.Isbn into temp1
+                var query = from t in db.Titles
+                            join i in db.Inventory on t.Isbn equals i.Isbn into temp1
                             from t1 in temp1.DefaultIfEmpty()
-                            join c in db.CheckedOut on i.Serial equals c.Serial into temp2
+                            join c in db.CheckedOut on t1.Serial equals c.Serial into temp2
                             from t2 in temp2.DefaultIfEmpty()
+                            join p in db.Patrons on t2.CardNum equals p.CardNum into temp3 
+                            from t3 in temp3.DefaultIfEmpty()
                             select new
                             {
                                 isbn = t1.Isbn,
-                                title = t1.Title,
-                                author = t1.Author,
-                                serial = t2 == null ? null : (uint? )t2.Serial
+                                title = t.Title,
+                                author = t.Author,
+                                serial = t2 == null ? null : (uint? )t2.Serial,
+                                name = t3 == null? String.Empty: t3.Name
                             };
 
-                System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(Json(query.ToArray()).Value));
+                //System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(Json(query.ToArray()).Value));
                 return Json(query.ToArray());
             }
 
