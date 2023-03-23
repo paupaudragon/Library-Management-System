@@ -84,6 +84,7 @@ namespace LibraryWebServer.Controllers
         {
 
             // TODO: Implement
+            // Tzhou: finished
             using (Team28LibraryContext db = new Team28LibraryContext())
             {
                 var query = from t in db.Titles
@@ -95,10 +96,10 @@ namespace LibraryWebServer.Controllers
                             from t3 in temp3.DefaultIfEmpty()
                             select new
                             {
-                                isbn = t1.Isbn,
+                                isbn = t.Isbn,
                                 title = t.Title,
                                 author = t.Author,
-                                serial = t2 == null ? null : (uint? )t2.Serial,
+                                serial = t1 == null ? null : (uint? )t1.Serial,
                                 name = t3 == null? String.Empty: t3.Name
                             };
 
