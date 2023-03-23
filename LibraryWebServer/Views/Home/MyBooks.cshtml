@@ -63,7 +63,13 @@
         url: '@Url.Action("ReturnBook", "Home")',
         dataType: 'json',
         data: { serial: serialInput },
+
+                alert(JSON.stringify(data)); // Added by zhou
+
         success: function (data, status) {
+
+          
+
           location.reload();
         },
         error: function (ex) {
@@ -89,7 +95,9 @@
         url: '@Url.Action("ListMyBooks", "Home")',
         dataType: 'json',
         success: function (data, status) {
-          //alert(JSON.stringify(data));
+
+          alert(JSON.stringify(data)); // added by tzhou
+
           PopulateTable(tblMyBooks, data);
         },
         error: function (ex) {

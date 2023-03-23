@@ -1,6 +1,9 @@
 ﻿using LibraryWebServer.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
 
 namespace LibraryWebServer.Controllers
 {
@@ -29,10 +32,7 @@ namespace LibraryWebServer.Controllers
         public IActionResult CheckLogin(string name, int cardnum)
         {
             // TODO: Fill in. Determine if login is successful or not.
-            System.Diagnostics.Debug.WriteLine(name);
-            System.Diagnostics.Debug.WriteLine(cardnum);
-
-
+            //Tzhou: Finished
             bool loginSuccessful = false;
             using (Team28LibraryContext db = new Team28LibraryContext())
             {
@@ -84,8 +84,26 @@ namespace LibraryWebServer.Controllers
         {
 
             // TODO: Implement
+            using (Team28LibraryContext db = new Team28LibraryContext())
+            {
+                var query = from i in db.Inventory
+                            join t in db.Titles on i.Isbn equals t.Isbn into temp1
+                            from t1 in temp1.DefaultIfEmpty()
+                            join c in db.CheckedOut on i.Serial equals c.Serial into temp2
+                            from t2 in temp2.DefaultIfEmpty()
+                            select new
+                            {
+                                isbn = t1.Isbn,
+                                title = t1.Title,
+                                author = t1.Author,
+                                serial = t2 == null ? null : (uint? )t2.Serial
+                            };
 
-            return Json(null);
+                System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(Json(query.ToArray()).Value));
+                return Json(query.ToArray());
+            }
+
+
 
         }
 
