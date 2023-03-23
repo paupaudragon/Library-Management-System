@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-using System.Runtime.CompilerServices;
-[assembly: InternalsVisibleTo("LibraryWebServerTest")]
-
 namespace LibraryWebServer.Controllers
 {
     public class HomeController : Controller
@@ -17,28 +14,7 @@ namespace LibraryWebServer.Controllers
         private static string user = "";
         private static int card = -1;
 
-        private readonly ILogger<HomeController>? _logger;
-
-        protected Team28LibraryContext db;
-
-        public HomeController()
-        {
-            db = new Team28LibraryContext();
-        }
-
-        public void UseLibraryContext(Team28LibraryContext ctx)
-        {
-            db = ctx;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        private readonly ILogger<HomeController> _logger;
 
         /// <summary>
         /// Given a Patron name and CardNum, verify that they exist and match in the database.
