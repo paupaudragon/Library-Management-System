@@ -1,12 +1,21 @@
-﻿using LibraryWebServer.Models;
+﻿/**
+ * Author: Course Staff(Starter Code)
+ *        Tingting Zhou 
+ *        Andy Tran
+ * Course: CS5530 2023 Spring
+ * 
+ */
+using LibraryWebServer.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json; // added by tzhou
 using System.Diagnostics;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Runtime.CompilerServices;
 
-
+[assembly: InternalsVisibleTo("TestProject1")]
 namespace LibraryWebServer.Controllers
 {
+    /// <summary>
+    /// This is the controller class for Library Web Server
+    /// </summary>
     public class HomeController : Controller
     {
 
@@ -18,6 +27,22 @@ namespace LibraryWebServer.Controllers
         private static int card = -1;
 
         private readonly ILogger<HomeController> _logger;
+
+        protected Team28LibraryContext db = new Team28LibraryContext();
+
+        public void UseLibraryContext(Team28LibraryContext ctx)
+        {
+            db = ctx;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
 
         /// <summary>
         /// Given a Patron name and CardNum, verify that they exist and match in the database.
@@ -31,18 +56,14 @@ namespace LibraryWebServer.Controllers
         [HttpPost]
         public IActionResult CheckLogin(string name, int cardnum)
         {
-            // TODO: Fill in. Determine if login is successful or not.
-            //Tzhou: Finished
+
             bool loginSuccessful = false;
-            using (Team28LibraryContext db = new Team28LibraryContext())
-            {
-                var query = from p in db.Patrons
-                            where p.Name == name && p.CardNum == cardnum
-                            select p;
 
-                loginSuccessful = query.Any();
-            }
+            var query = from p in db.Patrons
+                        where p.Name == name && p.CardNum == cardnum
+                        select p;
 
+            loginSuccessful = query.Any();
 
             if (!loginSuccessful)
             {
@@ -82,29 +103,22 @@ namespace LibraryWebServer.Controllers
         [HttpPost]
         public ActionResult AllTitles()
         {
-            // Tzhou: finished
-            using (Team28LibraryContext db = new Team28LibraryContext())
-            {
-                var query = from t in db.Titles
-                            join i in db.Inventory on t.Isbn equals i.Isbn into temp1
-                            from t1 in temp1.DefaultIfEmpty()
-                            join c in db.CheckedOut on t1.Serial equals c.Serial into temp2
-                            from t2 in temp2.DefaultIfEmpty()
-                            join p in db.Patrons on t2.CardNum equals p.CardNum into temp3
-                            from t3 in temp3.DefaultIfEmpty()
-                            select new
-                            {
-                                isbn = t.Isbn,
-                                title = t.Title,
-                                author = t.Author,
-                                serial = t1 == null ? null : (uint?)t1.Serial,
-                                name = t3 == null ? String.Empty : t3.Name
-                            };
-                System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(Json(query.ToArray()).Value));
-                return Json(query.ToArray());
-            }
-
-
+            var query = from t in db.Titles
+                        join i in db.Inventory on t.Isbn equals i.Isbn into temp1
+                        from t1 in temp1.DefaultIfEmpty()
+                        join c in db.CheckedOut on t1.Serial equals c.Serial into temp2
+                        from t2 in temp2.DefaultIfEmpty()
+                        join p in db.Patrons on t2.CardNum equals p.CardNum into temp3
+                        from t3 in temp3.DefaultIfEmpty()
+                        select new
+                        {
+                            isbn = t.Isbn,
+                            title = t.Title,
+                            author = t.Author,
+                            serial = t1 == null ? null : (uint?)t1.Serial,
+                            name = t3 == null ? String.Empty : t3.Name
+                        };
+            return Json(query.ToArray());
 
         }
 
@@ -119,27 +133,20 @@ namespace LibraryWebServer.Controllers
         [HttpPost]
         public ActionResult ListMyBooks()
         {
-            // Tzhou: finished
-            using (Team28LibraryContext db = new Team28LibraryContext())
-            {
-                var query = from c in db.CheckedOut
-                            where c.CardNum == card
-                            join i in db.Inventory on c.Serial equals i.Serial
-                            join t in db.Titles on i.Isbn equals t.Isbn
-                            join p in db.Patrons on c.CardNum equals p.CardNum
-                            select new
-                            {
-                                title = c == null ? String.Empty : t.Title,
-                                author = c == null ? String.Empty : t.Author,
-                                serial = c == null ? null : (uint?)c.Serial,
-                                name = c == null ? String.Empty : p.Name
+            var query = from c in db.CheckedOut
+                        where c.CardNum == card
+                        join i in db.Inventory on c.Serial equals i.Serial
+                        join t in db.Titles on i.Isbn equals t.Isbn
+                        join p in db.Patrons on c.CardNum equals p.CardNum
+                        select new
+                        {
+                            title = c == null ? String.Empty : t.Title,
+                            author = c == null ? String.Empty : t.Author,
+                            serial = c == null ? null : (uint?)c.Serial,
+                            name = c == null ? String.Empty : p.Name
 
-                            };
-                System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(Json(query.ToArray()).Value));
-                return Json(query.ToArray());
-
-            }
-
+                        };
+            return Json(query.ToArray());
         }
 
 
@@ -154,14 +161,12 @@ namespace LibraryWebServer.Controllers
         [HttpPost]
         public ActionResult CheckOutBook(int serial)
         {
-            using (Team28LibraryContext db = new Team28LibraryContext())
-            {
-                CheckedOut checkout = new CheckedOut() { CardNum = (uint)card, Serial = (uint)serial };
-                db.CheckedOut.Add(checkout);
-                db.SaveChanges();
-            }
+            CheckedOut checkout = new CheckedOut() { CardNum = (uint)card, Serial = (uint)serial };
+            db.CheckedOut.Add(checkout);
+            db.SaveChanges();
 
             return Json(new { success = true });
+
         }
 
         /// <summary>
@@ -174,14 +179,11 @@ namespace LibraryWebServer.Controllers
         [HttpPost]
         public ActionResult ReturnBook(int serial)
         {
-            using (Team28LibraryContext db = new Team28LibraryContext())
+            CheckedOut? rowToDelete = db.CheckedOut.FirstOrDefault(c => c.CardNum == card && c.Serial == serial);
+            if (rowToDelete != null)
             {
-                CheckedOut? rowToDelete = db.CheckedOut.FirstOrDefault(c => c.CardNum == card && c.Serial == serial);
-                if (rowToDelete != null)
-                {
-                    db.CheckedOut.Remove(rowToDelete);
-                    db.SaveChanges();
-                }
+                db.CheckedOut.Remove(rowToDelete);
+                db.SaveChanges();
             }
             return Json(new { success = true });
         }
